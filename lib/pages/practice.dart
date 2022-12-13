@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'package:flutter_apps/my_globals.dart';
 
 class Practice extends StatefulWidget {
   const Practice({Key? key}) : super(key: key);
@@ -9,6 +11,9 @@ class Practice extends StatefulWidget {
 
 class _PracticeState extends State<Practice> {
   int _currentIndex = 1;
+  String _answerToThisCard=" ";
+  var randomNumber= Random();
+  int i=0;
 
   @override
   Widget build(BuildContext context) {
@@ -44,54 +49,61 @@ class _PracticeState extends State<Practice> {
         selectedItemColor: Colors.amber[800],
       ),
 
-      body:Column(
-        children: [
-          Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const[
-                  SizedBox(height:100),
-                  Text('Card',
-                      style: TextStyle(
-                        fontSize: 50,
-                      )
+      body:Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height:150),
+            Text(questionBank[i].question,
+                style: const TextStyle(
+                  fontSize: 50,
+                )),
+            const SizedBox(height:20),
+            Text(_answerToThisCard,
+                style: const TextStyle(
+                  fontSize: 50,
+                )),
+            const SizedBox(height:100),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(40, 10, 10, 20),
+              child: Row(
+                children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.yellow[900],
+                      disabledForegroundColor: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _answerToThisCard = questionBank[i].answer;
+                      });
+                    },
+                    child: const Text('Show Answer',
+                        style: TextStyle(
+                          fontSize: 35,
+                        )),
                   ),
-                  SizedBox(height:30),
-                  Text('Title',
-                      style: TextStyle(
-                        fontSize: 100,
-                      )
+                  const SizedBox(width:15),
+                  IconButton(
+                    icon: const Icon(Icons.navigate_next),
+                    iconSize: 100,
+                    color: Colors.blue,
+                    onPressed: () {
+                      setState(() {
+                        _answerToThisCard = " ";
+                        i = randomNumber.nextInt(questionBank.length);
+                      });
+                    },
                   ),
-                  SizedBox(height:100),
                 ],
               ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.teal,
-                  disabledForegroundColor: Colors.grey,
-                ),
-                onPressed: () {},
-                child: const Text('Show Answer',
-                    style: TextStyle(
-                      fontSize: 35,
-                    )),
-              ),
-              IconButton(
-                icon: const Icon(Icons.navigate_next),
-                iconSize: 100,
-                color: Colors.blue,
-                onPressed: () {},
-              ),
-              ],
-          )
-        ],
-      )
+            ),
+
+          ],
+        ),
+      ),
     );
   }
 }
