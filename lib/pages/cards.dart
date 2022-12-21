@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_apps/pages/add_card.dart';
 import 'package:flutter_apps/my_globals.dart';
+import 'package:flutter_apps/question_set.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+Stream<List<QuestionSet>> readCards()  {
+  Stream<QuerySnapshot<Map<String, dynamic>>> snapshots = FirebaseFirestore.instance.collection('cardQuestions').snapshots();
+  return snapshots.map((event) => event.docs.map((e) => QuestionSet.fromJson(e.data())).toList());
+}
+
+Widget buildUser(QuestionSet questionSet) =>
+    const ListTile(
+      // leading: CircleAvatar(child: Text('${user.birthday}')),
+      //title: Text(questionSet.question),
+      //subtitle: Text(questionSet.answer),
+      title: Text("Akshay"),
+    );
 
 class FlashCard extends StatefulWidget {
   const FlashCard({Key? key}) : super(key: key);
@@ -66,11 +80,26 @@ class _FlashCardState extends State<FlashCard> {
     _currentIndex = 0;
 
     return Scaffold(
-      body: GridView.count(
+      body:StreamBuilder<List<QuestionSet>>(
+          stream: readCards(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Something went wrong ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              final users = snapshot.data!;
+              return ListView(
+                children: users.map(buildUser).toList(),
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }
+      ),
+      /*GridView.count(
         crossAxisCount: 2,
         children:
         questionBank.map((questionHere) => cardTemplate(questionHere)).toList(),
-      ),
+      ),*/
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Flash Cards",

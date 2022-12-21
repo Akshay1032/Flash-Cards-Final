@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_apps/my_globals.dart';
 import 'package:flutter_apps/question_set.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+Future createCard({required String question, required String answer}) async  {
+  final docUser = FirebaseFirestore.instance.collection('cardQuestions').doc(question);
+  final json = {
+    'id': question,
+    'question' : question,
+    'answer': answer,
+  };
+
+  await docUser.set(json);
+}
 
 class AddCard extends StatefulWidget {
 
@@ -60,6 +72,7 @@ class _AddCardState extends State<AddCard> {
                         userQuestion = _textQuestionController.text;
                         userAnswer = _textAnswerController.text;
                         questionBank.add(QuestionSet(question: userQuestion, answer: userAnswer));
+                        createCard(question: userQuestion, answer: userAnswer);
                         Navigator.pop(context,);
                       }
                     });
