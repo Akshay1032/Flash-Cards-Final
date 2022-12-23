@@ -13,9 +13,9 @@ class Practice extends StatefulWidget {
 
 class _PracticeState extends State<Practice> {
   int _currentIndex = 1;
-  String _answerToThisCard=" ";
-  var randomNumber= Random();
-  int i=0;
+  String _answerToThisCard = " ";
+  var randomNumber = Random();
+  int i = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -40,79 +40,95 @@ class _PracticeState extends State<Practice> {
           ),
         ],
         currentIndex: _currentIndex,
-        onTap: (index){
+        onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
-          if (index == 0){
+          if (index == 0) {
             Navigator.popUntil(context, ModalRoute.withName('/card'));
           }
         },
         selectedItemColor: Colors.amber[800],
       ),
-
-      body:StreamBuilder<List<QuestionSet>>(
+      body: StreamBuilder<List<QuestionSet>>(
           stream: readCards(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Something went wrong ${snapshot.error}');
             } else if (snapshot.hasData) {
               final cards = snapshot.data!;
-              return Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(height:150),
-                    Text(cards[i].question,
-                        style: const TextStyle(
-                          fontSize: 50,
-                        )),
-                    const SizedBox(height:20),
-                    Text(_answerToThisCard,
-                        style: const TextStyle(
-                          fontSize: 50,
-                        )),
-                    const SizedBox(height:100),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(40, 10, 10, 20),
-                      child: Row(
-                        children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.yellow[900],
-                              disabledForegroundColor: Colors.grey,
+              if (cards.length < 1) {
+                return EmptyWidget(
+                  image: null,
+                  packageImage: PackageImage.Image_1,
+                  title: 'No Cards',
+                  subTitle: 'No questions available for practice',
+                  titleTextStyle: const TextStyle(
+                    fontSize: 22,
+                    color: Color(0xff9da9c7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  subtitleTextStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xffabb8d6),
+                  ),
+                );
+              } else {
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 150),
+                      Text(cards[i].question,
+                          style: const TextStyle(
+                            fontSize: 50,
+                          )),
+                      const SizedBox(height: 20),
+                      Text(_answerToThisCard,
+                          style: const TextStyle(
+                            fontSize: 50,
+                          )),
+                      const SizedBox(height: 100),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(40, 10, 10, 20),
+                        child: Row(
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Colors.yellow[900],
+                                disabledForegroundColor: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _answerToThisCard = cards[i].answer;
+                                });
+                              },
+                              child: const Text('Show Answer',
+                                  style: TextStyle(
+                                    fontSize: 35,
+                                  )),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _answerToThisCard = cards[i].answer;
-                              });
-                            },
-                            child: const Text('Show Answer',
-                                style: TextStyle(
-                                  fontSize: 35,
-                                )),
-                          ),
-                          const SizedBox(width:15),
-                          IconButton(
-                            icon: const Icon(Icons.navigate_next),
-                            iconSize: 100,
-                            color: Colors.blue,
-                            onPressed: () {
-                              setState(() {
-                                _answerToThisCard = " ";
-                                i = randomNumber.nextInt(cards.length);
-                              });
-                            },
-                          ),
-                        ],
+                            const SizedBox(width: 15),
+                            IconButton(
+                              icon: const Icon(Icons.navigate_next),
+                              iconSize: 100,
+                              color: Colors.blue,
+                              onPressed: () {
+                                setState(() {
+                                  _answerToThisCard = " ";
+                                  i = randomNumber.nextInt(cards.length);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-
-                  ],
-                ),
-              );
+                    ],
+                  ),
+                );
+              }
             } else {
               //return const Center(child: CircularProgressIndicator());
               return EmptyWidget(
@@ -131,8 +147,7 @@ class _PracticeState extends State<Practice> {
                 ),
               );
             }
-          }
-      ),
+          }),
     );
   }
 }
