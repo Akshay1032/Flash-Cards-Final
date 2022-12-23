@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_apps/pages/add_card.dart';
-import 'package:flutter_apps/my_globals.dart';
 import 'package:flutter_apps/question_set.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-Stream<List<QuestionSet>> readCards()  {
-  Stream<QuerySnapshot<Map<String, dynamic>>> snapshots = FirebaseFirestore.instance.collection('cardQuestions').snapshots();
-  return snapshots.map((event) => event.docs.map((e) => QuestionSet.fromJson(e.data())).toList());
-}
-
-Widget buildUser(QuestionSet questionSet) =>
-    const ListTile(
-      // leading: CircleAvatar(child: Text('${user.birthday}')),
-      //title: Text(questionSet.question),
-      //subtitle: Text(questionSet.answer),
-      title: Text("Akshay"),
-    );
+import 'package:flutter_apps/support_func.dart';
+import 'package:empty_widget/empty_widget.dart';
+import 'package:flutter_no_internet_widget/flutter_no_internet_widget.dart';
 
 class FlashCard extends StatefulWidget {
   const FlashCard({Key? key}) : super(key: key);
@@ -61,7 +49,8 @@ class _FlashCardState extends State<FlashCard> {
                   IconButton(
                     onPressed: (){
                       setState(() {
-                        questionBank.remove(questionHere);
+                        //questionBank.remove(questionHere);
+                        deleteCard(question: questionHere.question);
                       });
                     },
                     icon: const Icon(Icons.delete, size:30),
@@ -78,28 +67,56 @@ class _FlashCardState extends State<FlashCard> {
   @override
   Widget build(BuildContext context) {
     _currentIndex = 0;
-
-    return Scaffold(
+    return InternetWidget(
+        offline:EmptyWidget(
+          image: null,
+          packageImage: PackageImage.Image_4,
+          title: 'No Internet Connection',
+          subTitle: 'Connect to the internet to continue',
+          titleTextStyle: const TextStyle(
+            fontSize: 22,
+            color: Color(0xff9da9c7),
+            fontWeight: FontWeight.w500,
+          ),
+          subtitleTextStyle: const TextStyle(
+            fontSize: 14,
+            color: Color(0xffabb8d6),
+          ),
+        ),
+        online:Scaffold(
       body:StreamBuilder<List<QuestionSet>>(
           stream: readCards(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Something went wrong ${snapshot.error}');
             } else if (snapshot.hasData) {
-              final users = snapshot.data!;
-              return ListView(
-                children: users.map(buildUser).toList(),
+              final cards = snapshot.data!;
+              return GridView.count(
+                crossAxisCount: 2,
+                children:
+                cards.map((questionHere) => cardTemplate(questionHere)).toList(),
               );
             } else {
-              return const Center(child: CircularProgressIndicator());
+              //return const Center(child: CircularProgressIndicator());
+              return  EmptyWidget(
+                image: null,
+                packageImage: PackageImage.Image_3,
+                title: 'No Cards',
+                subTitle: 'No questions have been added',
+                titleTextStyle: const TextStyle(
+                  fontSize: 22,
+                  color: Color(0xff9da9c7),
+                  fontWeight: FontWeight.w500,
+                ),
+                subtitleTextStyle: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xffabb8d6),
+                ),
+              );
             }
           }
       ),
-      /*GridView.count(
-        crossAxisCount: 2,
-        children:
-        questionBank.map((questionHere) => cardTemplate(questionHere)).toList(),
-      ),*/
+
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Flash Cards",
@@ -135,6 +152,7 @@ class _FlashCardState extends State<FlashCard> {
         },
         selectedItemColor: Colors.amber[800],
       ),
+    )
     );
   }
 }
